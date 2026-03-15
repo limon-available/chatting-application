@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
 import express from "express";
-
+import Message from "../models/Message.js";
 const app = express();
 const server = http.createServer(app);
 
@@ -36,9 +36,21 @@ io.on("connection", (socket) => {
 
     });
   
+  socket.on("stopTyping", ({ receiverId }) => {
+  const receiverSocketId = userSocketMap[receiverId];
+
+  if (receiverSocketId) {
+    io.to(receiverSocketId).emit("userStopTyping", {
+      senderId: socket.handshake.query.userId,
+    });
+  }
+});
   //messagedelivered
 
-  socket.on("messageDelivered", ({ messageId, senderId }) => {
+  socket.on("messageDelivered", async({ messageId, senderId }) => {
+      await Message.findByIdAndUpdate(messageId, {
+    delivered: true
+  });
   const senderSocketId = userSocketMap[senderId];
 
   if (senderSocketId) {
@@ -47,8 +59,10 @@ io.on("connection", (socket) => {
   });
   
   //messageseen
-  socket.on("messageSeen", ({ messageId, senderId }) => {
-
+  socket.on("messageSeen", async({ messageId, senderId }) => {
+    await Message.findByIdAndUpdate(messageId, {
+    seen: true
+  });
   const senderSocketId = userSocketMap[senderId];
 
   if (senderSocketId) {
