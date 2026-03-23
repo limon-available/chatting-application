@@ -14,9 +14,13 @@ const ChatContainer = () => {
   const { messages, isMessagesLoading, selectedUser } = useSelector(
     (state) => state.chat,
   );
-  console.log("messages", messages);
+  const selectedUserRef = useRef(null);
+
+  useEffect(() => {
+    selectedUserRef.current = selectedUser;
+  }, [selectedUser]);
   const { authUser } = useSelector((state) => state.auth);
-  console.log(socket);
+
   const messageEndRef = useRef(null);
 
   useEffect(() => {
@@ -26,24 +30,66 @@ const ChatContainer = () => {
   }, [selectedUser, dispatch]);
 
   useEffect(() => {
-    if (!socket || !selectedUser) return;
+    if (!socket) return;
 
-    socket.on("newMessage", (newMessage) => {
-      if (newMessage.senderId !== selectedUser._id) return;
+    const handleNewMessage = (newMessage) => {
+      const currentUser = selectedUserRef.current;
 
-      dispatch(addNewMessage(newMessage));
+      if (currentUser && newMessage.senderId === currentUser._id) {
+        dispatch(addNewMessage(newMessage));
+
+        socket.emit("messageSeen", {
+          messageId: newMessage._id,
+          senderId: newMessage.senderId,
+        });
+      }
 
       socket.emit("messageDelivered", {
         messageId: newMessage._id,
         senderId: newMessage.senderId,
       });
-    });
+    };
+
+    socket.on("newMessage", handleNewMessage);
 
     return () => {
-      socket.off("newMessage");
+      socket.off("newMessage", handleNewMessage);
     };
-  }, [socket, selectedUser, dispatch]);
+  }, [socket, dispatch]);
 
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleDelivered = ({ messageId }) => {
+      dispatch({
+        type: "chat/updateDelivered",
+        payload: messageId,
+      });
+    };
+
+    socket.on("messageDelivered", handleDelivered);
+
+    return () => {
+      socket.off("messageDelivered", handleDelivered);
+    };
+  }, [socket, dispatch]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleSeen = ({ messageId }) => {
+      dispatch({
+        type: "chat/updateSeen",
+        payload: messageId,
+      });
+    };
+
+    socket.on("messageSeen", handleSeen);
+
+    return () => {
+      socket.off("messageSeen", handleSeen);
+    };
+  }, [socket, dispatch]);
   // auto scroll to last message
   useEffect(() => {
     if (messageEndRef.current && messages) {
@@ -60,25 +106,22 @@ const ChatContainer = () => {
       if (senderId !== selectedUser._id) return;
 
       setIsTyping(true);
+    };
 
-      // পুরনো timer clear
-      if (typingTimeoutRef.current) {
-        clearTimeout(typingTimeoutRef.current);
-      }
+    const handleStopTyping = ({ senderId }) => {
+      if (senderId !== selectedUser._id) return;
 
-      // নতুন timer start
-      typingTimeoutRef.current = setTimeout(() => {
-        setIsTyping(false);
-      }, 5000);
+      setIsTyping(false);
     };
 
     socket.on("userTyping", handleTyping);
+    socket.on("userStopTyping", handleStopTyping);
 
     return () => {
       socket.off("userTyping", handleTyping);
+      socket.off("userStopTyping", handleStopTyping);
     };
   }, [socket, selectedUser]);
-
   useEffect(() => {
     if (selectedUser) {
       dispatch(markMessagesSeen(selectedUser._id));

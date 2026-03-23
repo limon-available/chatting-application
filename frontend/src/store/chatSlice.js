@@ -82,7 +82,23 @@ const chatSlice = createSlice({
       state.messages.push(action.payload);
     },
 
+    updateDelivered: (state, action) => {
+  const message = state.messages.find(
+    (m) => m._id === action.payload
+  );
+  if (message) {
+    message.delivered = true;
+  }
+},
 
+updateSeen: (state, action) => {
+  const message = state.messages.find(
+    (m) => m._id === action.payload
+  );
+  if (message) {
+    message.seen = true;
+  }
+},
     clearMessages: (state) => {
       state.messages = [];
     },

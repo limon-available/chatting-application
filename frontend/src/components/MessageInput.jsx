@@ -8,14 +8,23 @@ import toast from "react-hot-toast";
 
 const MessageInput = () => {
   const dispatch = useDispatch();
-
+  const typingTimeoutRef = useRef(null);
   const [text, setText] = useState("");
   const { selectedUser } = useSelector((state) => state.chat);
   const handleTyping = () => {
-    console.log("typing emitted");
     socket.emit("typing", {
       receiverId: selectedUser._id,
     });
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit("stopTyping", {
+        receiverId: selectedUser._id,
+      });
+    }, 1000);
   };
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
@@ -45,7 +54,9 @@ const MessageInput = () => {
     e.preventDefault();
 
     if (!text.trim() && !imagePreview) return;
-
+    socket.emit("stopTyping", {
+      receiverId: selectedUser._id,
+    });
     try {
       await dispatch(
         sendMessage({
