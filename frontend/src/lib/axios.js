@@ -4,6 +4,6 @@ const BASE_URL =
     ? "http://localhost:5000/api"
     : import.meta.env.VITE_API_URL;
 export const axiosInstance = axios.create({
-    baseURL: "import.meta.env.VIT_API_URL",
+    baseURL:BASE_URL,
     withCredentials:true
 })
