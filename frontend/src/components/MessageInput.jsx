@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { sendMessage } from "../store/chatSlice";
 import { useSelector } from "react-redux";
@@ -11,7 +11,11 @@ const MessageInput = () => {
   const typingTimeoutRef = useRef(null);
   const [text, setText] = useState("");
   const { selectedUser } = useSelector((state) => state.chat);
-  const handleTyping = () => {
+
+  const handleTyping = (value) => {
+    if (!selectedUser) return;
+    if (!value.trim()) return;
+
     socket.emit("typing", {
       receiverId: selectedUser._id,
     });
@@ -24,8 +28,16 @@ const MessageInput = () => {
       socket.emit("stopTyping", {
         receiverId: selectedUser._id,
       });
-    }, 1000);
+    }, 10000);
   };
+
+  useEffect(() => {
+    return () => {
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+    };
+  }, []);
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -105,7 +117,7 @@ const MessageInput = () => {
             value={text}
             onChange={(e) => {
               setText(e.target.value);
-              handleTyping();
+              handleTyping(e.target.value);
             }}
           />
 
