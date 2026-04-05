@@ -97,8 +97,6 @@ const ChatContainer = () => {
     }
   }, [messages]);
 
-  const typingTimeoutRef = useRef(null);
-
   useEffect(() => {
     if (!socket || !selectedUser) return;
 
