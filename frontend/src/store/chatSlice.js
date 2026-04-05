@@ -17,8 +17,6 @@ export const getUsers = createAsyncThunk(
   }
 );
 
-
-// get messages
 export const getMessages = createAsyncThunk(
   "chat/getMessages",
   async (userId, thunkAPI) => {
@@ -32,8 +30,6 @@ export const getMessages = createAsyncThunk(
   }
 );
 
-
-// send message
 export const sendMessage = createAsyncThunk(
   "chat/sendMessage",
   async (messageData, thunkAPI) => {

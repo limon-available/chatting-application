@@ -83,15 +83,18 @@ const authSlice = createSlice({
 
       socket = io(BASE_URL, {
         query: { userId: state.authUser._id },
+        withCredentials: true,
+        transports:["websocket"]
       });
 
-      socket.connect();
     },
       setOnlineUsers: (state, action) => {
   state.onlineUsers = action.payload;
 },
     disconnectSocket: () => {
-      if (socket?.connected) socket.disconnect();
+      if (socket?.connected)
+        socket.disconnect();
+      socket = null;
     },
   },
 
@@ -142,6 +145,7 @@ const authSlice = createSlice({
       .addCase(logout.fulfilled, (state) => {
         state.authUser = null;
         state.onlineUsers = [];
+         if (socket?.connected) socket.disconnect();
       })
     
           // update profile
