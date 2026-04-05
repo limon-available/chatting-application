@@ -25,9 +25,14 @@ io.on("connection", (socket) => {
   console.log("A user connected", socket.id);
 
   const userId = socket.handshake.query.userId;
-  if (userId) userSocketMap[userId] = socket.id;
 
+  if (!userId) {
+  console.log("No userId → disconnect");
+    return socket.disconnect(true);
+}
+  userSocketMap[userId] = socket.id;
 
+console.log(userSocketMap)
     socket.on("typing", ({ receiverId }) => {
     const receiverSocketId = userSocketMap[receiverId];
 
@@ -48,7 +53,6 @@ io.on("connection", (socket) => {
     });
   }
 });
-  //messagedelivered
 
   socket.on("messageDelivered", async({ messageId, senderId }) => {
       await Message.findByIdAndUpdate(messageId, {
@@ -61,7 +65,7 @@ io.on("connection", (socket) => {
   }
   });
   
-  //messageseen
+
   socket.on("messageSeen", async({ messageId, senderId }) => {
     await Message.findByIdAndUpdate(messageId, {
     seen: true
