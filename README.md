@@ -13,12 +13,12 @@ A full-stack real-time chat application built using the MERN stack with instant 
 
 ## ✨ Features
 
-* 🔐 User Authentication (Login / Signup)
-* 💬 Real-time messaging using Socket.io
-* 🟢 Online/Offline user status
-* 📩 Instant message delivery
-* 📱 Responsive UI (Mobile + Desktop)
-* 🔒 Secure API with JWT authentication
+- 🔐 User Authentication (Login / Signup)
+- 💬 Real-time messaging using Socket.io
+- 🟢 Online/Offline user status
+- 📩 Instant message delivery
+- 📱 Responsive UI (Mobile + Desktop)
+- 🔒 Secure API with JWT authentication
 
 ---
 
@@ -26,16 +26,16 @@ A full-stack real-time chat application built using the MERN stack with instant 
 
 **Frontend:**
 
-* React.js (Vite)
-* Axios
-* CSS / Tailwind 
+- React.js (Vite)
+- Axios
+- CSS / Tailwind
 
 **Backend:**
 
-* Node.js
-* Express.js
-* MongoDB
-* Socket.io
+- Node.js
+- Express.js
+- MongoDB
+- Socket.io
 
 ---
 
@@ -97,7 +97,7 @@ JWT_SECRET=your_secret_key
 
 ## 📸 Screenshots
 
-(Add your project screenshots here)
+![chatting](./screenshots/chatting.png)
 
 ---
 
