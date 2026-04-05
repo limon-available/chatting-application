@@ -53,7 +53,7 @@ A full-stack real-time chat application built using the MERN stack with instant 
 ### 1️⃣ Clone the repository
 
 ```
-git clone https://github.com/your-username/your-repo-name.git
+git clone https://github.com/limon-available/chatting-application.git
 ```
 
 ### 2️⃣ Install dependencies
