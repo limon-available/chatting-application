@@ -23,13 +23,31 @@ function App() {
   useEffect(() => {
     if (user) {
       dispatch(connectSocket());
-      socket.on("getOnlineUsers", (userIds) => {
-        console.log("online users:", userIds);
-        dispatch(setOnlineUsers(userIds));
+
+      // ✅ socket connect log
+      socket.on("connect", () => {
+        console.log("✅ socket connected:", socket.id);
+      });
+
+      // ✅ online users receive
+      socket.on("getOnlineUsers", (users) => {
+        console.log("🔥 online users:", users);
+        dispatch(setOnlineUsers(users));
+      });
+
+      // ❌ disconnect log (optional)
+      socket.on("disconnect", () => {
+        console.log("❌ socket disconnected");
       });
     }
-  }, [user]);
 
+    // ✅ cleanup (VERY IMPORTANT)
+    return () => {
+      socket?.off("connect");
+      socket?.off("getOnlineUsers");
+      socket?.off("disconnect");
+    };
+  }, [user]);
   return (
     <div data-theme={theme}>
       <Navbar />
